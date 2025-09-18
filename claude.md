@@ -360,3 +360,4 @@ Report bugs and request features through our GitHub Issues tracker.
 
 *This document serves as the primary reference for developers working on Survey Me. It should be updated whenever significant architectural decisions or changes are made to the project.*
 - rebuild, reinstall and tell me what to test after you change code
+- update feature roadmap when something is implemented

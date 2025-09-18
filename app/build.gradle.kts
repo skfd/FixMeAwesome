@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 android {
@@ -12,8 +13,8 @@ android {
         applicationId = "com.surveyme"
         minSdk = 23
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.1.3"
+        versionCode = 7
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -89,6 +90,15 @@ dependencies {
 
     // OSMDroid for OpenStreetMap
     implementation("org.osmdroid:osmdroid-android:6.1.18")
+
+    // Room database
+    val roomVersion = "2.6.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+
+    // Gson for JSON parsing (GPX tags)
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")
