@@ -362,3 +362,4 @@ Report bugs and request features through our GitHub Issues tracker.
 - rebuild, reinstall and tell me what to test after you change code
 - update feature roadmap when something is implemented
 - after implementing a feature give me one line COMMIT MESSAGE  I should use, and TO TEST list of thinkgings s to test
+- each time you complete, write into CHANGELOG.md file -- version you set, with a prompt you were working on, what you've done (summarize both very succinctly please)
