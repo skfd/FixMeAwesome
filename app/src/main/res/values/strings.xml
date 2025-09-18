@@ -44,4 +44,10 @@
     <string name="crash_logs_title">Crash Logs</string>
     <string name="no_logs">No logs available</string>
     <string name="logs_cleared">Logs cleared</string>
+
+    <!-- Tracking -->
+    <string name="start_tracking">Start Tracking</string>
+    <string name="stop_tracking">Stop Tracking</string>
+    <string name="tracking_active">Tracking Active</string>
+    <string name="tracking_inactive">Tracking Inactive</string>
 </resources>

@@ -100,6 +100,9 @@ dependencies {
     // Gson for JSON parsing (GPX tags)
     implementation("com.google.code.gson:gson:2.10.1")
 
+    // Google Play Services Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

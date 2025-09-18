@@ -35,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.take
 
 class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
 
@@ -320,7 +321,18 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val repository = PoiManager.getRepository(requireContext())
+
+                // Check if POIs exist, if not add sample POIs for testing
+                repository.getAllActivePois().take(1).collect { pois ->
+                    if (pois.isEmpty()) {
+                        Timber.d("No POIs found, adding sample POIs")
+                        repository.addSamplePois()
+                    }
+                }
+
+                // Now load and display POIs
                 repository.getAllActivePois().collectLatest { pois ->
+                    Timber.d("Loading ${pois.size} POIs onto map")
                     withContext(Dispatchers.Main) {
                         displayPoisOnMap(pois)
                     }

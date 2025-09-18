@@ -25,6 +25,11 @@
         android:theme="@style/Theme.SurveyMe"
         tools:targetApi="31">
 
+        <service
+            android:name=".service.LocationTrackingService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
+
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
