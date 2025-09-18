@@ -1,5 +1,14 @@
 # Survey Me - Android Application for OpenStreetMap Contributors
 
+## Important Development Rules
+
+### Version Management
+**ALWAYS increment the version code in `app/build.gradle.kts` when making code changes:**
+- Increment `versionCode` by 1 for any code modification
+- Update `versionName` following semantic versioning (MAJOR.MINOR.PATCH)
+- This prevents installation errors like `INSTALL_FAILED_VERSION_DOWNGRADE`
+- Required for proper app updates and testing
+
 ## Project Overview
 
 Survey Me is a specialized Android mapping application designed specifically for dedicated OpenStreetMap (OSM) contributors who engage in long walks and field surveys. The application serves as a powerful field survey tool that combines real-time GPS tracking with Points of Interest (PoI) notifications to assist mappers in identifying and documenting geographic features that need to be added or updated in OpenStreetMap.
@@ -350,3 +359,4 @@ Report bugs and request features through our GitHub Issues tracker.
 ---
 
 *This document serves as the primary reference for developers working on Survey Me. It should be updated whenever significant architectural decisions or changes are made to the project.*
+- rebuild, reinstall and tell me what to test after you change code

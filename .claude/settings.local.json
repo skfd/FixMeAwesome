@@ -10,7 +10,9 @@
       "Bash(adb:*)",
       "Bash(findstr:*)",
       "Bash(powershell:*)",
-      "Bash(.\\gradlew.bat clean:*)"
+      "Bash(.\\gradlew.bat clean:*)",
+      "Bash(cmd:*)",
+      "Bash(quick-build.bat)"
     ],
     "deny": [],
     "ask": []
