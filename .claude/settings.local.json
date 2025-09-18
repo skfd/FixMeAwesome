@@ -12,7 +12,8 @@
       "Bash(powershell:*)",
       "Bash(.\\gradlew.bat clean:*)",
       "Bash(cmd:*)",
-      "Bash(quick-build.bat)"
+      "Bash(quick-build.bat)",
+      "Bash(.\\gradlew.bat:*)"
     ],
     "deny": [],
     "ask": []

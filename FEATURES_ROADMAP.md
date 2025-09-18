@@ -140,7 +140,7 @@
 99. Add POI timestamp
 100. Define POI source types
 
-## Phase 11: GPX Import (Basic) ✅ PARTIALLY COMPLETED
+## Phase 11: GPX Import (Basic) ✅ COMPLETED
 101. Add file picker dependency
 102. Create "Import GPX" menu item
 103. Parse GPX file (basic waypoints only)

@@ -19,6 +19,12 @@ import com.surveyme.databinding.FragmentSettingsBinding
 import com.surveyme.presentation.base.BaseFragment
 import com.surveyme.presentation.debug.LogViewerDialog
 import timber.log.Timber
+import com.surveyme.data.PoiManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
@@ -53,8 +59,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
         setupSettings()
         setupPermissions()
+        setupPoiSection()
         setupDebugSection()
         updatePermissionStatus()
+        updatePoiCount()
     }
 
     override fun onResume() {
@@ -77,6 +85,73 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
             switchNotifications.setOnCheckedChangeListener { _, isChecked ->
                 preferencesManager.areNotificationsEnabled = isChecked
+            }
+        }
+    }
+
+    private fun setupPoiSection() {
+        with(binding) {
+            buttonAddSamplePois.setOnClickListener {
+                addSamplePois()
+            }
+
+            buttonClearPois.setOnClickListener {
+                clearAllPois()
+            }
+
+            buttonImportGpx.setOnClickListener {
+                Toast.makeText(context, "GPX import coming soon!", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun addSamplePois() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val repository = PoiManager.getRepository(requireContext())
+                repository.addSamplePois()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Sample POIs added!", Toast.LENGTH_SHORT).show()
+                    updatePoiCount()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Failed to add POIs: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun clearAllPois() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val repository = PoiManager.getRepository(requireContext())
+                repository.deleteAllFromSource("manual")
+                repository.deleteAllFromSource("gpx_import")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "All POIs cleared!", Toast.LENGTH_SHORT).show()
+                    updatePoiCount()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Failed to clear POIs: ${e.message}", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun updatePoiCount() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val repository = PoiManager.getRepository(requireContext())
+                val stats = repository.getStats()
+                withContext(Dispatchers.Main) {
+                    binding.textPoiCount.text = "${stats.first} POIs (${stats.second} visited)"
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    binding.textPoiCount.text = "Error loading count"
+                }
             }
         }
     }

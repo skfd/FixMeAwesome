@@ -24,8 +24,17 @@ import org.osmdroid.views.overlay.compass.InternalCompassOrientationProvider
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.views.overlay.Marker
 import timber.log.Timber
 import java.io.File
+import com.surveyme.data.PoiManager
+import com.surveyme.data.model.Poi
+import com.surveyme.data.model.PoiCategory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.collectLatest
 
 class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
 
@@ -34,6 +43,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
     private var myLocationOverlay: MyLocationNewOverlay? = null
     private var compassOverlay: CompassOverlay? = null
     private var rotationGestureOverlay: RotationGestureOverlay? = null
+    private val poiMarkers = mutableListOf<Marker>()
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -110,6 +120,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
 
         // Restore last position if available
         restoreMapPosition()
+
+        // Load and display POIs
+        loadPois()
     }
 
     private fun checkLocationPermissions() {
@@ -301,6 +314,71 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
         myLocationOverlay?.disableMyLocation()
         compassOverlay?.disableCompass()
         saveMapPosition()
+    }
+
+    private fun loadPois() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val repository = PoiManager.getRepository(requireContext())
+                repository.getAllActivePois().collectLatest { pois ->
+                    withContext(Dispatchers.Main) {
+                        displayPoisOnMap(pois)
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load POIs")
+            }
+        }
+    }
+
+    private fun displayPoisOnMap(pois: List<Poi>) {
+        // Clear existing POI markers
+        poiMarkers.forEach { marker ->
+            binding.mapView.overlays.remove(marker)
+        }
+        poiMarkers.clear()
+
+        // Add new POI markers
+        pois.forEach { poi ->
+            val marker = Marker(binding.mapView).apply {
+                position = GeoPoint(poi.latitude, poi.longitude)
+                title = poi.name
+                snippet = poi.description
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+
+                // Set icon based on category
+                icon = when (poi.category) {
+                    PoiCategory.TOURIST_ATTRACTION -> resources.getDrawable(android.R.drawable.star_on, null)
+                    PoiCategory.RESTAURANT -> resources.getDrawable(android.R.drawable.ic_menu_myplaces, null)
+                    PoiCategory.SHOP -> resources.getDrawable(android.R.drawable.ic_menu_manage, null)
+                    PoiCategory.PUBLIC_TRANSPORT -> resources.getDrawable(android.R.drawable.ic_menu_directions, null)
+                    PoiCategory.AMENITY -> resources.getDrawable(android.R.drawable.ic_menu_recent_history, null)
+                    PoiCategory.HISTORIC -> resources.getDrawable(android.R.drawable.ic_menu_gallery, null)
+                    PoiCategory.NATURAL -> resources.getDrawable(android.R.drawable.ic_menu_mapmode, null)
+                    PoiCategory.INFRASTRUCTURE -> resources.getDrawable(android.R.drawable.ic_menu_report_image, null)
+                    PoiCategory.UNKNOWN -> resources.getDrawable(android.R.drawable.ic_menu_info_details, null)
+                }
+
+                // Set click listener for info window
+                setOnMarkerClickListener { marker, mapView ->
+                    if (!marker.isInfoWindowOpen) {
+                        marker.showInfoWindow()
+                    } else {
+                        marker.closeInfoWindow()
+                    }
+                    mapView.controller.animateTo(marker.position)
+                    true
+                }
+            }
+
+            binding.mapView.overlays.add(marker)
+            poiMarkers.add(marker)
+        }
+
+        // Refresh the map
+        binding.mapView.invalidate()
+
+        Timber.d("Displayed ${pois.size} POIs on map")
     }
 
     override fun onDestroyView() {

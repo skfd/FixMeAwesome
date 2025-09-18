@@ -13,8 +13,8 @@ android {
         applicationId = "com.surveyme"
         minSdk = 23
         targetSdk = 34
-        versionCode = 7
-        versionName = "1.2.0"
+        versionCode = 9
+        versionName = "1.2.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
