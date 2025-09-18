@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Union Station",
+    "lat": 43.6457,
+    "lon": -79.38017,
+    "capacity": 47
+  },
+  {
+    "name": "St. George St / Bloor St W",
+    "lat": 43.66719,
+    "lon": -79.39956,
+    "capacity": 15
+  },
+  {
+    "name": "Wellesley Station Green P",
+    "lat": 43.66499,
+    "lon": -79.38351,
+    "capacity": 26
+  },
+  {
+    "name": "Bay St / Queens Quay W",
+    "lat": 43.64085,
+    "lon": -79.37675,
+    "capacity": 57
+  },
+  {
+    "name": "King St W / Spadina Ave",
+    "lat": 43.64518,
+    "lon": -79.39509,
+    "capacity": 19
+  },
+  {
+    "name": "Queen's Park / Bloor St W",
+    "lat": 43.6681,
+    "lon": -79.39374,
+    "capacity": 18
+  },
+  {
+    "name": "High Park - Grenadier Cafe",
+    "lat": 43.64558,
+    "lon": -79.46562,
+    "capacity": 11
+  },
+  {
+    "name": "Danforth Ave / Coxwell Ave",
+    "lat": 43.68344,
+    "lon": -79.32284,
+    "capacity": 15
+  },
+  {
+    "name": "College St / Huron St",
+    "lat": 43.65803,
+    "lon": -79.39817,
+    "capacity": 19
+  },
+  {
+    "name": "Dundas St W / Yonge St",
+    "lat": 43.65615,
+    "lon": -79.38143,
+    "capacity": 23
+  },
+  {
+    "name": "Temperance St Station",
+    "lat": 43.65085,
+    "lon": -79.37988,
+    "capacity": 60
+  },
+  {
+    "name": "Metro Hall Plaza",
+    "lat": 43.64582,
+    "lon": -79.38845,
+    "capacity": 27
+  },
+  {
+    "name": "Riverdale Park North",
+    "lat": 43.67117,
+    "lon": -79.35461,
+    "capacity": 15
+  },
+  {
+    "name": "Distillery District",
+    "lat": 43.65039,
+    "lon": -79.35639,
+    "capacity": 23
+  },
+  {
+    "name": "Queen St W / Ossington Ave",
+    "lat": 43.64393,
+    "lon": -79.41974,
+    "capacity": 23
+  },
+  {
+    "name": "Nathan Phillips Square",
+    "lat": 43.65269,
+    "lon": -79.38306,
+    "capacity": 35
+  },
+  {
+    "name": "Harbourfront Centre",
+    "lat": 43.63894,
+    "lon": -79.38232,
+    "capacity": 42
+  },
+  {
+    "name": "CN Tower",
+    "lat": 43.64219,
+    "lon": -79.38705,
+    "capacity": 30
+  },
+  {
+    "name": "Rogers Centre",
+    "lat": 43.64155,
+    "lon": -79.38915,
+    "capacity": 25
+  },
+  {
+    "name": "Eaton Centre",
+    "lat": 43.65433,
+    "lon": -79.38086,
+    "capacity": 28
+  }
+]

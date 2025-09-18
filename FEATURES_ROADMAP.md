@@ -21,6 +21,7 @@
 - ✅ POI display on map with category-based icons
 - ✅ Proximity detection with geofencing logic
 - ✅ Notification system with Android 13+ permission handling
+- ✅ Toronto Bike Share data integration (20 stations from JSON)
 
 ## ✅ COMPLETED PHASES
 

@@ -13,7 +13,10 @@
       "Bash(.\\gradlew.bat clean:*)",
       "Bash(cmd:*)",
       "Bash(quick-build.bat)",
-      "Bash(.\\gradlew.bat:*)"
+      "Bash(.\\gradlew.bat:*)",
+      "Bash(copy data_samplesbikeshare_osm.geojson appsrcmainassetsbikeshare_osm.geojson)",
+      "Bash(dir appsrcmainassets)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []

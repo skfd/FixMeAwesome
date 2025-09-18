@@ -1,5 +1,10 @@
 # Survey Me - Changelog
 
+## Version 1.2.3 (2025-09-18)
+
+**Toronto Data**: "read file from data_samples folder"
+Integrated 20 Toronto Bike Share stations as default POI data loaded from JSON on app launch.
+
 ## Version 1.2.2 (2025-09-18)
 
 **Phase 13**: Proximity Detection - "notifications are not sent"

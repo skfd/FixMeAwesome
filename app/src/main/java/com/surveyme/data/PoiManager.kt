@@ -10,7 +10,7 @@ object PoiManager {
     fun getRepository(context: Context): PoiRepository {
         if (repository == null) {
             val database = SurveyMeDatabase.getDatabase(context.applicationContext)
-            repository = PoiRepository(database)
+            repository = PoiRepository(database, context.applicationContext)
         }
         return repository!!
     }
