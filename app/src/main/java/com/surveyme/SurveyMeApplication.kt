@@ -1,6 +1,7 @@
 package com.surveyme
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import timber.log.Timber
 import java.io.File
@@ -22,6 +23,20 @@ class SurveyMeApplication : Application() {
         instance = this
         setupCrashHandler()
         initializeTimber()
+        initializeOSMDroid()
+    }
+
+    private fun initializeOSMDroid() {
+        try {
+            // Initialize OSMDroid configuration
+            val config = org.osmdroid.config.Configuration.getInstance()
+            config.load(this, android.preference.PreferenceManager.getDefaultSharedPreferences(this))
+            // Set a user agent to avoid getting banned from tile servers
+            config.userAgentValue = packageName
+            Timber.d("OSMDroid initialized with user agent: $packageName")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to initialize OSMDroid")
+        }
     }
 
     private fun initializeTimber() {
@@ -41,7 +56,6 @@ class SurveyMeApplication : Application() {
 
     private fun logCrashToFile(throwable: Throwable) {
         try {
-            val logFile = File(filesDir, "crash_log.txt")
             val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
             val stringWriter = StringWriter()
@@ -49,6 +63,8 @@ class SurveyMeApplication : Application() {
             throwable.printStackTrace(printWriter)
             val stackTrace = stringWriter.toString()
 
+            // Save to file
+            val logFile = File(filesDir, "crash_log.txt")
             FileWriter(logFile, true).use { writer ->
                 writer.appendLine("\n=== CRASH at $timestamp ===")
                 writer.appendLine("Message: ${throwable.message}")
@@ -56,6 +72,23 @@ class SurveyMeApplication : Application() {
                 writer.appendLine(stackTrace)
                 writer.appendLine("=== END CRASH ===\n")
             }
+
+            // ALSO save to SharedPreferences for immediate access
+            val prefs = getSharedPreferences("crash_prefs", Context.MODE_PRIVATE)
+            val crashInfo = buildString {
+                appendLine("CRASH at $timestamp")
+                appendLine("Error: ${throwable.message}")
+                appendLine("")
+                appendLine("Location: ${throwable.stackTrace.firstOrNull()}")
+                appendLine("")
+                appendLine("First 5 stack frames:")
+                throwable.stackTrace.take(5).forEach { frame ->
+                    appendLine("  at $frame")
+                }
+            }
+            prefs.edit().putString("last_crash", crashInfo).apply()
+
+            Log.e("SurveyMeApp", "CRASH SAVED TO PREFS: $crashInfo")
         } catch (e: Exception) {
             Log.e("SurveyMeApp", "Failed to write crash log", e)
         }

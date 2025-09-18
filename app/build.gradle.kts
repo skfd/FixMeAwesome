@@ -12,8 +12,8 @@ android {
         applicationId = "com.surveyme"
         minSdk = 23
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.1"
+        versionCode = 4
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -86,6 +86,9 @@ dependencies {
 
     // Timber for logging
     implementation("com.jakewharton.timber:timber:5.0.1")
+
+    // OSMDroid for OpenStreetMap
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     // Testing dependencies
     testImplementation("junit:junit:4.13.2")

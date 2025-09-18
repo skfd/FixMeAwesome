@@ -9,6 +9,10 @@
 
     <!-- Map -->
     <string name="my_location">My Location</string>
+    <string name="zoom_in">Zoom In</string>
+    <string name="zoom_out">Zoom Out</string>
+    <string name="map_loading">Loading map…</string>
+    <string name="map_click">Map clicked at: %1$.4f, %2$.4f</string>
 
     <!-- Tracks -->
     <string name="no_tracks_yet">No tracks yet</string>
@@ -23,6 +27,13 @@
     <string name="map_style">Map Style</string>
     <string name="map_style_default">Standard</string>
     <string name="app_version">Version</string>
+
+    <!-- Permissions -->
+    <string name="settings_permissions">Permissions</string>
+    <string name="location_permission">Location</string>
+    <string name="background_location_permission">Background Location</string>
+    <string name="permission_granted">Granted</string>
+    <string name="permission_denied">Denied</string>
 
     <!-- Debug -->
     <string name="settings_debug">Debug</string>

@@ -39,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 
         // Define top-level destinations (no back button)
         val topLevelDestinations = setOf(
+            R.id.homeFragment,
             R.id.mapFragment,
             R.id.tracksFragment,
             R.id.settingsFragment

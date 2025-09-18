@@ -1,13 +1,19 @@
 package com.surveyme.presentation.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.surveyme.BuildConfig
 import com.surveyme.R
 import com.surveyme.SurveyMeApplication
+import com.surveyme.core.PermissionManager
 import com.surveyme.core.PreferencesManager
 import com.surveyme.databinding.FragmentSettingsBinding
 import com.surveyme.presentation.base.BaseFragment
@@ -17,6 +23,19 @@ import timber.log.Timber
 class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     private lateinit var preferencesManager: PreferencesManager
+    private lateinit var permissionManager: PermissionManager
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        updatePermissionStatus()
+    }
+
+    private val backgroundLocationLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        updatePermissionStatus()
+    }
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -30,8 +49,17 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
         Timber.d("SettingsFragment onViewCreated")
 
         preferencesManager = PreferencesManager(requireContext())
+        permissionManager = PermissionManager(requireContext())
+
         setupSettings()
+        setupPermissions()
         setupDebugSection()
+        updatePermissionStatus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updatePermissionStatus()
     }
 
     private fun setupSettings() {
@@ -51,6 +79,91 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 preferencesManager.areNotificationsEnabled = isChecked
             }
         }
+    }
+
+    private fun setupPermissions() {
+        with(binding) {
+            layoutLocationPermission.setOnClickListener {
+                if (!permissionManager.hasLocationPermission()) {
+                    requestLocationPermissions()
+                } else {
+                    openAppSettings()
+                }
+            }
+
+            layoutBackgroundPermission.setOnClickListener {
+                if (!permissionManager.hasBackgroundLocationPermission()) {
+                    requestBackgroundLocationPermission()
+                } else {
+                    openAppSettings()
+                }
+            }
+        }
+    }
+
+    private fun updatePermissionStatus() {
+        val hasLocation = permissionManager.hasLocationPermission()
+        val hasBackground = permissionManager.hasBackgroundLocationPermission()
+
+        with(binding) {
+            // Update location permission status
+            if (hasLocation) {
+                textLocationStatus.text = getString(R.string.permission_granted)
+                textLocationStatus.setTextColor(
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
+                )
+            } else {
+                textLocationStatus.text = getString(R.string.permission_denied)
+                textLocationStatus.setTextColor(
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
+                )
+            }
+
+            // Update background permission status
+            if (hasBackground) {
+                textBackgroundStatus.text = getString(R.string.permission_granted)
+                textBackgroundStatus.setTextColor(
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_green_dark)
+                )
+            } else {
+                textBackgroundStatus.text = getString(R.string.permission_denied)
+                textBackgroundStatus.setTextColor(
+                    ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark)
+                )
+            }
+        }
+    }
+
+    private fun requestLocationPermissions() {
+        if (permissionManager.shouldShowLocationPermissionRationale(requireActivity())) {
+            permissionManager.showLocationPermissionRationale(requireActivity()) {
+                permissionManager.requestLocationPermissions(this, locationPermissionLauncher)
+            }
+        } else {
+            permissionManager.requestLocationPermissions(this, locationPermissionLauncher)
+        }
+    }
+
+    private fun requestBackgroundLocationPermission() {
+        if (!permissionManager.hasLocationPermission()) {
+            Toast.makeText(requireContext(), "Grant location permission first", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (permissionManager.shouldShowBackgroundLocationRationale(requireActivity())) {
+            permissionManager.showBackgroundLocationRationale(requireActivity()) {
+                permissionManager.requestBackgroundLocationPermission(this, backgroundLocationLauncher)
+            }
+        } else {
+            permissionManager.requestBackgroundLocationPermission(this, backgroundLocationLauncher)
+        }
+    }
+
+    private fun openAppSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", requireContext().packageName, null)
+        }
+        startActivity(intent)
     }
 
     private fun setupDebugSection() {

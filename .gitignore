@@ -103,3 +103,5 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+android_logs.txt
+surveyme_logs.txt
