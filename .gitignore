@@ -105,3 +105,5 @@ lint/tmp/
 *.hprof
 android_logs.txt
 surveyme_logs.txt
+test_output.txt
+parser_debug.log

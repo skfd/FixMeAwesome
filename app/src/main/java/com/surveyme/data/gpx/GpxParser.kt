@@ -57,28 +57,28 @@ class GpxParser {
                                 }
                             }
                             "name" -> {
-                                if (inWaypoint && parser.next() == XmlPullParser.TEXT) {
-                                    currentName = parser.text
+                                if (inWaypoint) {
+                                    currentName = parser.nextText().trim()
                                 }
                             }
                             "desc" -> {
-                                if (inWaypoint && parser.next() == XmlPullParser.TEXT) {
-                                    currentDesc = parser.text
+                                if (inWaypoint) {
+                                    currentDesc = parser.nextText().trim()
                                 }
                             }
                             "type" -> {
-                                if (inWaypoint && parser.next() == XmlPullParser.TEXT) {
-                                    currentType = parser.text
+                                if (inWaypoint) {
+                                    currentType = parser.nextText().trim()
                                 }
                             }
                             "time" -> {
-                                if (inWaypoint && parser.next() == XmlPullParser.TEXT) {
-                                    currentTime = parseTime(parser.text)
+                                if (inWaypoint) {
+                                    currentTime = parseTime(parser.nextText().trim())
                                 }
                             }
                             "ele" -> {
-                                if (inWaypoint && parser.next() == XmlPullParser.TEXT) {
-                                    currentElevation = parser.text.toDoubleOrNull()
+                                if (inWaypoint) {
+                                    currentElevation = parser.nextText().toDoubleOrNull()
                                 }
                             }
                         }
