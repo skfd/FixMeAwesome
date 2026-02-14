@@ -5,6 +5,7 @@ plugins {
     id("kotlin-kapt")
 }
 
+
 android {
     namespace = "com.surveyme"
     compileSdk = 34
@@ -100,7 +101,7 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.18")
 
     // Room database
-    val roomVersion = "2.6.1"
+    val roomVersion = "2.7.0-alpha11"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
