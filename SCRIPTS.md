@@ -26,6 +26,12 @@ These scripts allow you to simulate location movement on the Android Emulator. E
 | **`gps-toronto-walker.ps1`** | **Toronto Station Walker.** Simulations walking between Bike Share stations in Toronto. Use **WASD** to move, **N** to walk to the next station, or **T** to teleport. |
 | **`gps-toronto-tour.ps1`** | **Automated Tour.** Automatically moves the GPS location through a predefined list of Toronto Bike Share stations, pausing at each one. |
 
+## Debugging
+
+| Script | Description |
+| :--- | :--- |
+| **`show-logs.ps1`** | **Log Viewer.** Streams `adb logcat` output filtered for the app package (`com.surveyme`), crashes (`AndroidRuntime`), and system errors. Press `Ctrl+C` to stop. |
+
 ## Usage Notes
 
 *   **Execution Policy:** You may need to set your PowerShell execution policy to run scripts: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`

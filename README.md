@@ -46,6 +46,12 @@ sdk.dir=C:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
 ./gradlew clean build
 ```
 
+## Debugging
+To view app logs and crash reports:
+```powershell
+./show-logs.ps1
+```
+
 ## Automation Scripts
 See [SCRIPTS.md](SCRIPTS.md) for details on available PowerShell scripts for building, testing, and GPS simulation.
 
