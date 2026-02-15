@@ -46,6 +46,10 @@ sdk.dir=C:\\Users\\YourName\\AppData\\Local\\Android\\Sdk
 ./gradlew clean build
 ```
 
+## Automation Scripts
+See [SCRIPTS.md](SCRIPTS.md) for details on available PowerShell scripts for building, testing, and GPS simulation.
+
+
 ## Project Structure
 ```
 app/

@@ -11,8 +11,8 @@ Add-Type @"
 "@
 
 class GPSSimulator {
-    [double]$Latitude = 37.7749   # San Francisco
-    [double]$Longitude = -122.4194
+    [double]$Latitude = 43.65615   # Toronto (Dundas Square)
+    [double]$Longitude = -79.38143
     [double]$SpeedKmh = 10        # Speed in km/h
     [double]$UpdateInterval = 0.2  # Update every 200ms
 
@@ -97,7 +97,8 @@ class GPSSimulator {
 
         if ($movement.Count -gt 0) {
             Write-Host ($movement -join " ") -ForegroundColor Cyan
-        } else {
+        }
+        else {
             Write-Host "Stopped" -ForegroundColor Gray
         }
 
@@ -151,7 +152,8 @@ class GPSSimulator {
                 $this.SpeedKmh = [Math]::Min(50, $this.SpeedKmh + 5)
                 $this.DisplayStatus($north, $south, $east, $west)
                 $wasPlus = $true
-            } elseif (-not $plus) {
+            }
+            elseif (-not $plus) {
                 $wasPlus = $false
             }
 
@@ -159,7 +161,8 @@ class GPSSimulator {
                 $this.SpeedKmh = [Math]::Max(5, $this.SpeedKmh - 5)
                 $this.DisplayStatus($north, $south, $east, $west)
                 $wasMinus = $true
-            } elseif (-not $minus) {
+            }
+            elseif (-not $minus) {
                 $wasMinus = $false
             }
 
@@ -172,7 +175,8 @@ class GPSSimulator {
                 Start-Sleep -Seconds 2
                 $this.DisplayStatus($north, $south, $east, $west)
                 $wasSpace = $true
-            } elseif (-not $space) {
+            }
+            elseif (-not $space) {
                 $wasSpace = $false
             }
 
@@ -225,7 +229,8 @@ try {
             exit 0
         }
     }
-} catch {
+}
+catch {
     Write-Host "Error checking ADB: $_" -ForegroundColor Red
     exit 1
 }
