@@ -41,11 +41,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:layout_marginBottom="80dp"
-        android:contentDescription="@string/zoom_out"
         app:fabSize="mini"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/zoom_out"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_zoom_out" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

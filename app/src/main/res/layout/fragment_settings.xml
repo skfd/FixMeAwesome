@@ -249,6 +249,20 @@
                     android:background="?attr/colorOutline" />
 
                 <TextView
+                    android:id="@+id/buttonFindBikes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="16dp"
+                    android:text="@string/find_bikes"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?attr/colorOutline" />
+
+                <TextView
                     android:id="@+id/buttonAddSamplePois"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

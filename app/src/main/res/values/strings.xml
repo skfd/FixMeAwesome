@@ -13,6 +13,7 @@
     <string name="zoom_out">Zoom Out</string>
     <string name="map_loading">Loading map…</string>
     <string name="map_click">Map clicked at: %1$.4f, %2$.4f</string>
+    <string name="find_bikes">Find Bikes</string>
 
     <!-- Tracks -->
     <string name="no_tracks_yet">No tracks yet</string>

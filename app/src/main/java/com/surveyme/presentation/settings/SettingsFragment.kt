@@ -20,6 +20,8 @@ import com.surveyme.presentation.base.BaseFragment
 import com.surveyme.presentation.debug.LogViewerDialog
 import timber.log.Timber
 import com.surveyme.data.PoiManager
+import com.surveyme.data.OverpassService
+import com.surveyme.core.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -102,6 +104,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             buttonImportGpx.setOnClickListener {
                 Toast.makeText(context, "GPX import coming soon!", Toast.LENGTH_SHORT).show()
             }
+
+            buttonFindBikes.setOnClickListener {
+                findBikes()
+            }
         }
     }
 
@@ -118,6 +124,49 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(context, "Failed to add POIs: ${e.message}", Toast.LENGTH_LONG).show()
                 }
+            }
+        }
+    }
+
+    private fun findBikes() {
+        // Disable button immediately to prevent double clicks and satisfy "clicked once" requirement
+        binding.buttonFindBikes.isEnabled = false
+        binding.buttonFindBikes.alpha = 0.5f
+
+        val lastLocation = preferencesManager.getLastMapPosition()
+        val lat = lastLocation?.first ?: Constants.DEFAULT_MAP_CENTER_LAT
+        val lon = lastLocation?.second ?: Constants.DEFAULT_MAP_CENTER_LON
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Searching for bike stations around last known map position...", Toast.LENGTH_SHORT).show()
+                }
+
+                val overpassService = OverpassService()
+                // Use a larger radius since we might be off-center or zoomed out
+                val stations = overpassService.fetchDockingStations(lat, lon, 2000)
+
+                if (stations.isNotEmpty()) {
+                    val repository = PoiManager.getRepository(requireContext())
+                    repository.insertPois(stations)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Found and saved ${stations.size} stations!", Toast.LENGTH_LONG).show()
+                        updatePoiCount()
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "No stations found nearby.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Error searching for bikes: ${e.message}", Toast.LENGTH_LONG).show()
+                    // Re-enable in case of error? User said "clicked once", but error retry seems fair.
+                    // Sticking to "once" strictly as per request for now to avoid complexity, 
+                    // or maybe just keep it disabled to avoid spamming errors.
+                }
+                Timber.e(e, "Error searching for bikes")
             }
         }
     }

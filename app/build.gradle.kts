@@ -98,6 +98,9 @@ dependencies {
     // OSMDroid for OpenStreetMap
     implementation("org.osmdroid:osmdroid-android:6.1.20")
 
+    // OkHttp for network requests
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     // Room database
     val roomVersion = "2.8.4"
     implementation("androidx.room:room-runtime:$roomVersion")
