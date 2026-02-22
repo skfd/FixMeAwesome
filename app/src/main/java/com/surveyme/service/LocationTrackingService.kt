@@ -103,14 +103,20 @@ class LocationTrackingService : Service() {
 
     private fun handleLocationUpdate(location: Location) {
         Timber.d("Location update: ${location.latitude}, ${location.longitude}")
-        Timber.d("POI cache size: ${poisCache.size}")
+        // Create a snapshot of the POIs to avoid ConcurrentModificationException
+        // if the list is updated on a background thread while iterating
+        val currentPois = synchronized(poisCache) {
+            poisCache.toList()
+        }
+
+        Timber.d("POI cache size: ${currentPois.size}")
 
         // Check proximity to POIs
-        if (poisCache.isNotEmpty()) {
-            Timber.d("Checking proximity to ${poisCache.size} POIs...")
+        if (currentPois.isNotEmpty()) {
+            Timber.d("Checking proximity to ${currentPois.size} POIs...")
 
             // Log distances to all POIs for debugging
-            poisCache.forEach { poi ->
+            currentPois.forEach { poi ->
                 val distance = poi.distanceTo(location.latitude, location.longitude)
                 Timber.d("Distance to ${poi.name}: ${distance}m (radius: ${poi.notificationRadius}m)")
             }
@@ -118,7 +124,7 @@ class LocationTrackingService : Service() {
             proximityDetector.checkProximity(
                 location.latitude,
                 location.longitude,
-                poisCache
+                currentPois
             ) { poi, distance ->
                 Timber.d("Proximity notification triggered for ${poi.name} at ${distance}m")
                 showPoiNotification(poi, distance)
@@ -137,8 +143,10 @@ class LocationTrackingService : Service() {
             try {
                 val repository = PoiManager.getRepository(this@LocationTrackingService)
                 repository.getAllActivePois().collectLatest { pois ->
-                    poisCache.clear()
-                    poisCache.addAll(pois)
+                    synchronized(poisCache) {
+                        poisCache.clear()
+                        poisCache.addAll(pois)
+                    }
                     Timber.d("Loaded ${pois.size} POIs for proximity detection")
                 }
             } catch (e: Exception) {
