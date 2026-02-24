@@ -25,8 +25,12 @@ import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import timber.log.Timber
 import java.io.File
+import android.content.Intent
+import android.graphics.Color
+import androidx.lifecycle.lifecycleScope
 import com.surveyme.data.PoiManager
 import com.surveyme.data.model.Poi
 import com.surveyme.data.model.PoiCategory
@@ -36,6 +40,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.take
+import com.surveyme.service.LocationTrackingService
+import com.surveyme.data.model.ActiveTrack
+import kotlinx.coroutines.Job
+import java.util.Locale
 
 class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
 
@@ -45,6 +53,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
     private var compassOverlay: CompassOverlay? = null
     private var rotationGestureOverlay: RotationGestureOverlay? = null
     private val poiMarkers = mutableListOf<Marker>()
+    private var activeTrackPolyline: Polyline? = null
+    private val trackMarkers = mutableListOf<Marker>()
+    
+    private var trackingJob: Job? = null
+    private var activeTrackJob: Job? = null
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -124,6 +137,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
 
         // Load and display POIs
         loadPois()
+        
+        // Observe Tracking State
+        observeTrackingState()
     }
 
     private fun checkLocationPermissions() {
@@ -268,6 +284,72 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
         }
     }
 
+    private fun observeTrackingState() {
+        trackingJob = viewLifecycleOwner.lifecycleScope.launch {
+            LocationTrackingService.isTrackingFlow.collectLatest { isTracking ->
+                if (!isTracking) {
+                    clearActiveTrack()
+                }
+            }
+        }
+
+        activeTrackJob = viewLifecycleOwner.lifecycleScope.launch {
+            LocationTrackingService.activeTrackFlow.collectLatest { track ->
+                updateActiveTrackOnMap(track)
+            }
+        }
+    }
+
+    private fun updateActiveTrackOnMap(track: ActiveTrack) {
+        if (track.points.isEmpty()) return
+        
+        // Only draw if drawing setting is enabled
+        if (preferencesManager?.isDrawTrackEnabled != true) {
+            clearActiveTrack()
+            return
+        }
+
+        // Draw Polyline
+        if (activeTrackPolyline == null) {
+            activeTrackPolyline = Polyline(binding.mapView).apply {
+                outlinePaint.color = Color.BLUE
+                outlinePaint.strokeWidth = 10f
+            }
+            binding.mapView.overlays.add(activeTrackPolyline)
+        }
+
+        val geoPoints = track.points.map { GeoPoint(it.latitude, it.longitude) }
+        activeTrackPolyline?.setPoints(geoPoints)
+
+        // Draw basic markers every 20 points
+        if (track.points.size % 20 == 0 && track.points.isNotEmpty()) {
+            val point = track.points.last()
+            val marker = Marker(binding.mapView).apply {
+                position = GeoPoint(point.latitude, point.longitude)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                icon = resources.getDrawable(android.R.drawable.presence_online, null)
+            }
+            trackMarkers.add(marker)
+            binding.mapView.overlays.add(marker)
+        }
+
+        binding.mapView.invalidate()
+    }
+
+    private fun clearActiveTrack() {
+        activeTrackPolyline?.let {
+            binding.mapView.overlays.remove(it)
+        }
+        activeTrackPolyline = null
+
+        trackMarkers.forEach {
+            binding.mapView.overlays.remove(it)
+        }
+        trackMarkers.clear()
+
+        binding.mapView.invalidate()
+    }
+
     private fun restoreMapPosition() {
         preferencesManager?.getLastMapPosition()?.let { (lat, lon, zoom) ->
             val position = GeoPoint(lat, lon)
@@ -394,6 +476,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(), MapEventsReceiver {
     }
 
     override fun onDestroyView() {
+        trackingJob?.cancel()
+        activeTrackJob?.cancel()
         binding.mapView.onDetach()
         super.onDestroyView()
     }

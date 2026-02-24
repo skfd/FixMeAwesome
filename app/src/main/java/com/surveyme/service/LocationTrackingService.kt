@@ -24,9 +24,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.surveyme.data.model.ActiveTrack
+import com.surveyme.data.model.TrackPoint
 
 class LocationTrackingService : Service() {
 
@@ -39,6 +44,12 @@ class LocationTrackingService : Service() {
 
         private const val LOCATION_INTERVAL = 5000L // 5 seconds
         private const val FASTEST_LOCATION_INTERVAL = 2000L // 2 seconds
+
+        private val _isTrackingFlow = MutableStateFlow(false)
+        val isTrackingFlow: StateFlow<Boolean> = _isTrackingFlow.asStateFlow()
+
+        private val _activeTrackFlow = MutableStateFlow(ActiveTrack())
+        val activeTrackFlow: StateFlow<ActiveTrack> = _activeTrackFlow.asStateFlow()
     }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -134,6 +145,41 @@ class LocationTrackingService : Service() {
             Timber.w("No POIs in cache for proximity detection")
         }
 
+        // --- Track Recording Logic ---
+        val currentTrack = _activeTrackFlow.value
+        val lastPoint = currentTrack.points.lastOrNull()
+
+        var incrementalDistance = 0f
+        if (lastPoint != null) {
+            val results = FloatArray(1)
+            Location.distanceBetween(
+                lastPoint.latitude, lastPoint.longitude,
+                location.latitude, location.longitude,
+                results
+            )
+            incrementalDistance = results[0]
+        }
+
+        val totalDistance = currentTrack.totalDistance + incrementalDistance
+        val startTime = if (currentTrack.startTime == 0L) System.currentTimeMillis() else currentTrack.startTime
+        val duration = System.currentTimeMillis() - startTime
+
+        val newPoint = TrackPoint(
+            latitude = location.latitude,
+            longitude = location.longitude,
+            altitude = location.altitude,
+            time = location.time,
+            distanceFromStart = totalDistance
+        )
+
+        _activeTrackFlow.value = currentTrack.copy(
+            points = currentTrack.points + newPoint,
+            totalDistance = totalDistance,
+            startTime = startTime,
+            duration = duration
+        )
+        // ------------------------------
+
         // Update the ongoing notification with current location
         updateNotification(location)
     }
@@ -181,6 +227,8 @@ class LocationTrackingService : Service() {
 
         Timber.d("Starting location tracking")
         isTracking = true
+        _isTrackingFlow.value = true
+        _activeTrackFlow.value = ActiveTrack() // Reset track
 
         // Start as foreground service
         val notification = createNotification()
@@ -211,6 +259,7 @@ class LocationTrackingService : Service() {
 
         Timber.d("Stopping location tracking")
         isTracking = false
+        _isTrackingFlow.value = false
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
         stopForeground(true)

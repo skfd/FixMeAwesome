@@ -77,6 +77,7 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
             // Set current values
             switchDarkMode.isChecked = preferencesManager.isDarkMode
             switchNotifications.isChecked = preferencesManager.areNotificationsEnabled
+            switchDrawTrack.isChecked = preferencesManager.isDrawTrackEnabled
             textMapStyle.text = preferencesManager.mapStyle.capitalize()
             textVersion.text = BuildConfig.VERSION_NAME
 
@@ -87,6 +88,10 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
             switchNotifications.setOnCheckedChangeListener { _, isChecked ->
                 preferencesManager.areNotificationsEnabled = isChecked
+            }
+
+            switchDrawTrack.setOnCheckedChangeListener { _, isChecked ->
+                preferencesManager.isDrawTrackEnabled = isChecked
             }
         }
     }

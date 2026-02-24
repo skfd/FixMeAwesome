@@ -21,6 +21,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_LAST_LATITUDE = "last_latitude"
         private const val KEY_LAST_LONGITUDE = "last_longitude"
         private const val KEY_LAST_ZOOM = "last_zoom"
+        private const val KEY_DRAW_TRACK = "draw_track"
     }
 
     var isDarkMode: Boolean
@@ -43,6 +44,13 @@ class PreferencesManager(context: Context) {
         set(value) {
             prefs.edit().putString(KEY_MAP_STYLE, value).apply()
             Timber.d("Map style set to: $value")
+        }
+
+    var isDrawTrackEnabled: Boolean
+        get() = prefs.getBoolean(KEY_DRAW_TRACK, true)
+        set(value) {
+            prefs.edit().putBoolean(KEY_DRAW_TRACK, value).apply()
+            Timber.d("Draw track enabled: $value")
         }
 
     var isFirstLaunch: Boolean
