@@ -1,5 +1,10 @@
 # Survey Me - Changelog
 
+## Version 1.2.4 (2026-03-15)
+
+**Phase 8**: Database Setup (Room) - "implement"
+Added TrackEntity, LocationPointEntity, TrackDao, database migration, and backup utility to lay the groundwork for track persistence.
+
 ## Version 1.2.3 (2025-09-18)
 
 **Toronto Data**: "read file from data_samples folder"
