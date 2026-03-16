@@ -19,6 +19,7 @@ import com.surveyme.R
 import com.surveyme.core.ProximityDetector
 import com.surveyme.data.PoiManager
 import com.surveyme.data.model.Poi
+import com.surveyme.data.TrackManager
 import com.surveyme.presentation.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -260,6 +261,30 @@ class LocationTrackingService : Service() {
         Timber.d("Stopping location tracking")
         isTracking = false
         _isTrackingFlow.value = false
+
+        // Save track before resetting if it has points
+        val currentTrack = _activeTrackFlow.value
+        if (currentTrack.points.isNotEmpty()) {
+            serviceScope.launch {
+                try {
+                    val trackRepository = TrackManager.getRepository(this@LocationTrackingService)
+                    // Basic date formatting for default name
+                    val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
+                    val dateString = dateFormat.format(java.util.Date(currentTrack.startTime))
+                    val defaultName = "Track - $dateString"
+                    
+                    trackRepository.saveActiveTrack(currentTrack, defaultName)
+                    Timber.d("Successfully saved track: $defaultName with ${currentTrack.points.size} points")
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to save track to database")
+                } finally {
+                    // Reset track after attempting save
+                    _activeTrackFlow.value = ActiveTrack()
+                }
+            }
+        } else {
+            _activeTrackFlow.value = ActiveTrack()
+        }
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
         stopForeground(true)
